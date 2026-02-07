@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceParser9000.Core", "SpaceParser9000.Core\SpaceParser9000.Core.csproj", "{95E5A45E-9E58-46CD-B238-BB04F0474C04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceParser9000.Application", "SpaceParser9000.Application\SpaceParser9000.Application.csproj", "{225E573F-EA1A-4907-95A2-1A9F5F0006DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceParser9000.Tests", "SpaceParser9000.Tests\SpaceParser9000.Tests.csproj", "{DC83A736-8B2D-4E8D-8E7E-B3CE63A985DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95E5A45E-9E58-46CD-B238-BB04F0474C04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E5A45E-9E58-46CD-B238-BB04F0474C04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E5A45E-9E58-46CD-B238-BB04F0474C04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E5A45E-9E58-46CD-B238-BB04F0474C04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{225E573F-EA1A-4907-95A2-1A9F5F0006DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{225E573F-EA1A-4907-95A2-1A9F5F0006DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{225E573F-EA1A-4907-95A2-1A9F5F0006DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{225E573F-EA1A-4907-95A2-1A9F5F0006DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC83A736-8B2D-4E8D-8E7E-B3CE63A985DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC83A736-8B2D-4E8D-8E7E-B3CE63A985DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC83A736-8B2D-4E8D-8E7E-B3CE63A985DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC83A736-8B2D-4E8D-8E7E-B3CE63A985DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
