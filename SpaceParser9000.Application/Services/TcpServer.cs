@@ -1,35 +1,40 @@
 using System.Buffers;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using SpaceParser9000.Application.Extensions;
 using SpaceParser9000.Core.Interfaces;
-using SpaceParser9000.Core.Models;
 
 namespace SpaceParser9000.Application.Services;
 
-public class TcpServer : ITcpServer
+public class TcpServer : ITcpServer, IDisposable
 {
+    private readonly ConcurrentDictionary<string, SemaphoreSlim> _addressInUseDict = new();
+    
     public async Task StartAsync(string host, int port, CancellationToken ct = default)
     {
-        Console.WriteLine($"TCP-сервер запущен по адресу {host}:{port}");
+        var address = $"{host}:{port}";
 
+        var semaphore = _addressInUseDict.GetOrAdd(address, _ => new SemaphoreSlim(1, 1));
+        await semaphore.WaitAsync(ct);
         try
         {
-            using Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            var ipAddress = System.Net.IPAddress.Parse(host);
-            var endPoint = new System.Net.IPEndPoint(ipAddress, port);
-            socket.Bind(endPoint);
+            Console.WriteLine($"TCP-сервер запущен по адресу {address}");
+
+            using Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Parse(host), port));
             socket.Listen();
 
-            while (true)
+            while (!ct.IsCancellationRequested)
             {
                 Socket clientSocket = await socket.AcceptAsync(ct);
                 _ = HandleClientSocketAsync(clientSocket, ct);
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) 
+        { }
+        finally
         {
-            
+            semaphore.Release();
         }
     }
 
@@ -69,6 +74,17 @@ public class TcpServer : ITcpServer
         finally
         {
             clientSocket.Dispose();
+        }
+    }
+
+    public void Dispose()
+    {
+        foreach (var (address, semaphore) in _addressInUseDict)
+        {
+            if (_addressInUseDict.TryRemove(address, out _))
+            {
+                semaphore.Dispose();
+            }
         }
     }
 }
