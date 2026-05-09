@@ -50,14 +50,14 @@ public static class CommandParser
 
                 return false;
             }
-            wordLength = input.Slice(spacePointer).IndexOf(CommandSeparator) + 1;
-            if (wordLength == 0)
+            wordLength = input.Slice(spacePointer).IndexOf(CommandSeparator);
+            if (wordLength < 0)
             {
                 wordLength = input.Slice(spacePointer).Length;
                 break;
             }
 
-            isSpace = wordLength == 1 && input[spacePointer] == CommandSeparator;
+            isSpace = wordLength == 0 && input[spacePointer] == CommandSeparator;
             
         } while (isSpace);
 

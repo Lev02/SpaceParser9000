@@ -19,6 +19,16 @@ public class CommandParserTests
         Assert.False(string.IsNullOrWhiteSpace(command.Key.ToString()));
         Assert.False(string.IsNullOrWhiteSpace(command.Value.ToString()));
     }
+
+    [Fact]
+    public void Parse_WhenInputHasThreeArgs_ParsesExactValues()
+    {
+        var command = CommandParser.Parse("SET myKey myValue");
+
+        Assert.Equal("SET", command.CommandName.ToString());
+        Assert.Equal("myKey", command.Key.ToString());
+        Assert.Equal("myValue", command.Value.ToString());
+    }
     
     [Theory]
     [InlineData("get testKey")]
@@ -32,6 +42,16 @@ public class CommandParserTests
         //Assert
         Assert.False(string.IsNullOrWhiteSpace(command.CommandName.ToString()));
         Assert.False(string.IsNullOrWhiteSpace(command.Key.ToString()));
+        Assert.True(string.IsNullOrWhiteSpace(command.Value.ToString()));
+    }
+
+    [Fact]
+    public void Parse_WhenInputHasTwoArgs_ParsesExactValues()
+    {
+        var command = CommandParser.Parse("GET myKey");
+
+        Assert.Equal("GET", command.CommandName.ToString());
+        Assert.Equal("myKey", command.Key.ToString());
         Assert.True(string.IsNullOrWhiteSpace(command.Value.ToString()));
     }
     

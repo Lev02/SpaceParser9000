@@ -29,13 +29,13 @@ public class TcpServer : ITcpServer, IDisposable
         {
             Console.WriteLine($"TCP-сервер запущен по адресу {address}");
 
-            using Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Parse(host), port));
-            socket.Listen();
+            using Socket serverSocket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            serverSocket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Parse(host), port));
+            serverSocket.Listen();
 
             while (!ct.IsCancellationRequested)
             {
-                Socket clientSocket = await socket.AcceptAsync(ct);
+                Socket clientSocket = await serverSocket.AcceptAsync(ct);
                 _ = HandleClientSocketAsync(clientSocket, ct);
             }
         }
@@ -62,12 +62,12 @@ public class TcpServer : ITcpServer, IDisposable
                         return;
 
                     ReadOnlyMemory<byte> bytesRead = arrayPool.AsMemory(0, bytesReadCount);
-                    
+
                     var charArray = ArrayPool<char>.Shared.Rent(bytesReadCount);
                     try
                     {
-                        ParseClientResponse(charArray, bytesRead);
-                       
+                        var result = ExecuteClientRequest(charArray, bytesRead);
+                        await clientSocket.SendAsync(result, ct);
                     }
                     finally
                     {
@@ -86,7 +86,8 @@ public class TcpServer : ITcpServer, IDisposable
         }
     }
 
-    private void ParseClientResponse(char[] charArray, ReadOnlyMemory<byte> bytesRead)
+    /// <returns>true if request was parsed successfully, otherwise false</returns>
+    private byte[] ExecuteClientRequest(char[] charArray, ReadOnlyMemory<byte> bytesRead)
     {
         int charCount = System.Text.Encoding.UTF8.GetChars(bytesRead.Span, charArray);
         var command = CommandParser.Parse(charArray.AsSpan(0, charCount));
@@ -99,18 +100,18 @@ public class TcpServer : ITcpServer, IDisposable
                 Console.WriteLine(bytesResult == null
                     ? $"GET RESULT: {NotFoundMessage}"
                     : $"GET RESULT: {Encoding.UTF8.GetString(bytesResult)}");
-                break;
+                return bytesResult ?? [0];
             case "SET":
                 command.SendToCommandLine();
                 _store.Set(command.Key.ToString(), Encoding.UTF8.GetBytes(command.Value.ToArray()));
-                break;
+                return [1];
             case "DELETE":
                 command.SendToCommandLine();
                 _store.Delete(command.Key.ToString());
-                break;
+                return [1];
             default:
                 Console.WriteLine($"{UnknownCommandMessage}: {charArray.AsSpan(0, charCount).ToString()}");
-                break;
+                return [0];
         }
     }
 
