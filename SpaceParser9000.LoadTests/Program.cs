@@ -1,5 +1,6 @@
-﻿using System.Text;
+﻿using System.Text.Json;
 using NBomber.CSharp;
+using SpaceParser9000.Core.Models;
 using SpaceParser9000.LoadTests;
 
 static string GenerateRandomString(int length)
@@ -16,7 +17,12 @@ var scenario = Scenario.Create("default_cache_scenario", async context =>
     var serverPort = 8080;
     
     var randomKey = GenerateRandomString(10);
-    var randomValue = GenerateRandomString(10);
+    var randomUserProfile = new UserProfile()
+    {
+        Id = Random.Shared.Next(0, int.MaxValue),
+        CreatedAt = new DateTime(Random.Shared.Next(0, int.MaxValue)),
+        Username = GenerateRandomString(10),
+    };
     
     //в ДЗ сказано создавать клиент на каждом шаге отдельно, но если так делать,
     //то в некоторых сценариях возникает ошибка " Обычно разрешается только одно использование адреса сокета (протокол/сетевой адрес/порт). 127.0.0.1:8080"
@@ -26,7 +32,7 @@ var scenario = Scenario.Create("default_cache_scenario", async context =>
     
     var setStep = await Step.Run<object?>("set", context, async() =>
     {
-        bool result = await testClient.SetAsync(randomKey, randomValue);
+        bool result = await testClient.SetAsync(randomKey, randomUserProfile);
         return result ? Response.Ok() : Response.Fail();
     });
     
@@ -39,8 +45,8 @@ var scenario = Scenario.Create("default_cache_scenario", async context =>
         if (resultBytes.Length <= 0) 
             return Response.Fail();
         
-        string resultStr = Encoding.UTF8.GetString(resultBytes);
-        return resultStr == randomValue ? Response.Ok() : Response.Fail();
+        var userProfile = JsonSerializer.Deserialize<UserProfile>(resultBytes);
+        return userProfile == randomUserProfile ? Response.Ok() : Response.Fail();
     });
     
     if (getStep1.IsError)
@@ -68,7 +74,7 @@ var scenario = Scenario.Create("default_cache_scenario", async context =>
     Simulation.RampingInject(rate: 100,
         interval: TimeSpan.FromSeconds(1),
         during: TimeSpan.FromSeconds(5)),
-    // Стабильная нагрузка
+    //Стабильная нагрузка
     Simulation.Inject(rate: 100,
         interval: TimeSpan.FromSeconds(1),
         during: TimeSpan.FromSeconds(30))

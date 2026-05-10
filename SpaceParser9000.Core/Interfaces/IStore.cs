@@ -1,9 +1,11 @@
+using SpaceParser9000.Core.Models;
+
 namespace SpaceParser9000.Core.Interfaces;
 
 public interface IStore
 {
-    void Set(string key, byte[] value);
-    byte[]? Get(string key);
+    void Set(string key, UserProfile profile);
+    UserProfile? Get(string key);
     void Delete(string key);
     (long setCount, long getCount, long deleteCount) GetStatistics();
 }

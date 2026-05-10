@@ -1,4 +1,5 @@
 using SpaceParser9000.Application.Services;
+using SpaceParser9000.Core.Models;
 using Xunit;
 
 namespace SpaceParser9000.Tests;
@@ -22,7 +23,13 @@ public class SimpleStoreTests
         //Act
         for (int i = 1; i <= expectedSetCount; i++)
         {
-            setTasks.Add(Task.Run(() => store.Set(mainKey, [ (byte)rnd.Next(1, 255) ])));
+            var idx = i;
+            setTasks.Add(Task.Run(() => store.Set(mainKey, new UserProfile()
+            {
+                Username = $"user{idx}",
+                Id = idx,
+                CreatedAt = DateTime.Now,
+            })));
         }
         
         for (int i = 0; i < expectedGetCount; i++)

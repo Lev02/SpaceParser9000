@@ -1,6 +1,8 @@
 using System.Buffers;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using SpaceParser9000.Core.Models;
 
 namespace SpaceParser9000.LoadTests;
 
@@ -16,9 +18,10 @@ public class TestTcpClient : IDisposable
         _clientSocket.Connect(new System.Net.IPEndPoint(System.Net.IPAddress.Parse(host), port));
     }
     
-    public async Task<bool> SetAsync(string key, string value)
+    public async Task<bool> SetAsync(string key, UserProfile profile)
     {
-        var requestBytes = Encoding.UTF8.GetBytes($"SET {key} {value}");
+        var profileJson = JsonSerializer.Serialize(profile);
+        var requestBytes = Encoding.UTF8.GetBytes($"SET {key} {profileJson}");
         await _clientSocket.SendAsync(requestBytes, SocketFlags.None);
         
         var result = await GetServerSocketResponseAsync();

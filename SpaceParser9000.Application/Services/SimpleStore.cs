@@ -1,4 +1,6 @@
 using SpaceParser9000.Core.Interfaces;
+using SpaceParser9000.Core.Models;
+using System.Text.Json;
 
 namespace SpaceParser9000.Application.Services;
 
@@ -11,15 +13,16 @@ public class SimpleStore : IStore, IDisposable
     private long _getCount = 0;
     private long _deleteCount = 0;
     
-    public void Set(string key, byte[] value)
+    public void Set(string key, UserProfile profile)
     {
         try
         {
             _lock.EnterWriteLock();
             
-            bool addSuccess = _data.TryAdd(key, value);
+            var profileBytes = JsonSerializer.SerializeToUtf8Bytes(profile);
+            bool addSuccess = _data.TryAdd(key, profileBytes);
             if (!addSuccess)
-                _data[key] = value;
+                _data[key] = profileBytes;
             Interlocked.Increment(ref _setCount);
         }
         finally
@@ -28,13 +31,15 @@ public class SimpleStore : IStore, IDisposable
         }
     }
 
-    public byte[]? Get(string key)
+    public UserProfile? Get(string key)
     {
         bool isSuccess = true;
         try
         {
             _lock.EnterReadLock();
-            return _data.GetValueOrDefault(key);
+            var bytes = _data.GetValueOrDefault(key);
+            var profile = JsonSerializer.Deserialize<UserProfile>(bytes);
+            return profile;
         }
         catch
         {

@@ -2,8 +2,10 @@ using System.Buffers;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using SpaceParser9000.Application.Extensions;
 using SpaceParser9000.Core.Interfaces;
+using SpaceParser9000.Core.Models;
 
 namespace SpaceParser9000.Application.Services;
 
@@ -11,6 +13,7 @@ public class TcpServer : ITcpServer, IDisposable
 {
     private const string NotFoundMessage = "NOT FOUND";
     private const string UnknownCommandMessage = "UNKNOWN COMMAND";
+    private const string CouldNotParseMessage = "COULD NOT PARSE USER PROFILE JSON";
     private readonly IStore _store;
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _addressInUseDict = new();
 
@@ -96,14 +99,21 @@ public class TcpServer : ITcpServer, IDisposable
         {
             case "GET":
                 command.SendToCommandLine();
-                var bytesResult = _store.Get(command.Key.ToString());
-                Console.WriteLine(bytesResult == null
+                var getProfile = _store.Get(command.Key.ToString());
+                var getProfileBytes = JsonSerializer.SerializeToUtf8Bytes(getProfile);
+                Console.WriteLine(getProfile == null
                     ? $"GET RESULT: {NotFoundMessage}"
-                    : $"GET RESULT: {Encoding.UTF8.GetString(bytesResult)}");
-                return bytesResult ?? [0];
+                    : $"GET RESULT: {Encoding.UTF8.GetString(getProfileBytes)}");
+                return getProfile == null ? [0] : getProfileBytes;
             case "SET":
                 command.SendToCommandLine();
-                _store.Set(command.Key.ToString(), Encoding.UTF8.GetBytes(command.Value.ToArray()));
+                var setProfile = JsonSerializer.Deserialize<UserProfile>(command.Value);
+                if (setProfile == null)
+                {
+                    Console.WriteLine($"{CouldNotParseMessage}: {command.Value}");
+                    return [0];
+                }
+                _store.Set(command.Key.ToString(), setProfile);
                 return [1];
             case "DELETE":
                 command.SendToCommandLine();
