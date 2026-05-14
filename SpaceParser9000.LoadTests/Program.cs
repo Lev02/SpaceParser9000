@@ -1,7 +1,12 @@
 ﻿using System.Text.Json;
+using BenchmarkDotNet.Running;
 using NBomber.CSharp;
 using SpaceParser9000.Core.Models;
 using SpaceParser9000.LoadTests;
+
+BenchmarkRunner.Run<Benchmarks>();
+
+return;
 
 static string GenerateRandomString(int length)
 {

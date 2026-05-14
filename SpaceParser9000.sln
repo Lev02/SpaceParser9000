@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceParser9000.UI.Console"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceParser9000.LoadTests", "SpaceParser9000.LoadTests\SpaceParser9000.LoadTests.csproj", "{3C5AEB66-8D89-4831-9822-DC07A47F6296}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceParser9000.Generator", "SpaceParser9000.Generator\SpaceParser9000.Generator.csproj", "{B3F343CF-68DA-48EB-B7B3-1C8DDE717F53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{3C5AEB66-8D89-4831-9822-DC07A47F6296}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C5AEB66-8D89-4831-9822-DC07A47F6296}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C5AEB66-8D89-4831-9822-DC07A47F6296}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3F343CF-68DA-48EB-B7B3-1C8DDE717F53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3F343CF-68DA-48EB-B7B3-1C8DDE717F53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3F343CF-68DA-48EB-B7B3-1C8DDE717F53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3F343CF-68DA-48EB-B7B3-1C8DDE717F53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

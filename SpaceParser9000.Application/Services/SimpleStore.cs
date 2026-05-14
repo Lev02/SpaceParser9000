@@ -12,14 +12,16 @@ public class SimpleStore : IStore, IDisposable
     private long _setCount = 0;
     private long _getCount = 0;
     private long _deleteCount = 0;
-    
+
     public void Set(string key, UserProfile profile)
     {
         try
         {
             _lock.EnterWriteLock();
-            
-            var profileBytes = JsonSerializer.SerializeToUtf8Bytes(profile);
+
+            using MemoryStream ms = new();
+            profile.SerializeToBinary(ms);
+            var profileBytes = ms.ToArray();
             bool addSuccess = _data.TryAdd(key, profileBytes);
             if (!addSuccess)
                 _data[key] = profileBytes;
